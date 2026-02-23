@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       setupFiles: ['./vitest.setup.ts'],
       globals: true,
+      passWithNoTests: true,
       include: ['src/**/*.test.{ts,tsx}'],
       env: {
         NEXT_PUBLIC_SUPABASE_URL: env.NEXT_PUBLIC_SUPABASE_URL ?? '',
