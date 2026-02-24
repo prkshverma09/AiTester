@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isCorrect, MCQQuestion, SubjectiveQuestion } from './questions'
+import { isCorrect, QUESTIONS, MCQQuestion, SubjectiveQuestion } from './questions'
 
 const mcq: MCQQuestion = {
   id: 'q1', type: 'mcq', text: 'What is 2+2?',
@@ -49,5 +49,17 @@ describe('isCorrect', () => {
     it('returns false for empty string', () => {
       expect(isCorrect(subjective, '')).toBe(false)
     })
+  })
+})
+
+describe('QUESTIONS loader', () => {
+  it('loads 12 questions from mixed-demo.json', () => {
+    expect(QUESTIONS).toHaveLength(12)
+  })
+  it('first question is MCQ', () => {
+    expect(QUESTIONS[0].type).toBe('mcq')
+  })
+  it('last question is subjective', () => {
+    expect(QUESTIONS[11].type).toBe('subjective')
   })
 })

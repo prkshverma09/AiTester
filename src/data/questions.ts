@@ -62,5 +62,7 @@ export function isCorrect(question: Question, answer: string | number): boolean 
   return accepted.some(a => norm(a) === norm(String(answer)))
 }
 
-// --- Data loader (populated in next task) ---
-export const QUESTIONS: Question[] = []
+// --- Data loader ---
+import mixedDemoData from './questions/mixed-demo.json'
+
+export const QUESTIONS: Question[] = (mixedDemoData as QuestionSet).questions
