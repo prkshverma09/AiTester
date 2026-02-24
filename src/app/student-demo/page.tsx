@@ -6,29 +6,46 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { QUESTIONS } from '@/data/questions'
+import { QUESTIONS, isCorrect, MCQQuestion } from '@/data/questions'
+
+type AnswerValue = number | string
+
+function initAnswers(): AnswerValue[] {
+  return QUESTIONS.map(q => (q.type === 'mcq' ? -1 : ''))
+}
+
+function isAnswered(question: (typeof QUESTIONS)[number], value: AnswerValue): boolean {
+  if (question.type === 'mcq') return typeof value === 'number' && value !== -1
+  return typeof value === 'string' && value.trim() !== ''
+}
 
 export default function StudentDemoPage() {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [selectedAnswers, setSelectedAnswers] = useState<number[]>(
-    Array(QUESTIONS.length).fill(-1)
-  )
+  const [answers, setAnswers] = useState<AnswerValue[]>(initAnswers)
   const [completed, setCompleted] = useState(false)
 
   const question = QUESTIONS[currentIndex]
-  const selected = selectedAnswers[currentIndex]
+  const currentAnswer = answers[currentIndex]
   const progress = ((currentIndex + 1) / QUESTIONS.length) * 100
 
-  function handleSelect(optionIndex: number) {
-    setSelectedAnswers(prev => {
+  function handleSelectMCQ(optionIndex: number) {
+    setAnswers(prev => {
       const next = [...prev]
       next[currentIndex] = optionIndex
       return next
     })
   }
 
+  function handleTypeSubjective(text: string) {
+    setAnswers(prev => {
+      const next = [...prev]
+      next[currentIndex] = text
+      return next
+    })
+  }
+
   function handleNext() {
-    if (selected === -1) return
+    if (!isAnswered(question, currentAnswer)) return
     if (currentIndex === QUESTIONS.length - 1) {
       setCompleted(true)
     } else {
@@ -42,14 +59,12 @@ export default function StudentDemoPage() {
 
   function handleReset() {
     setCurrentIndex(0)
-    setSelectedAnswers(Array(QUESTIONS.length).fill(-1))
+    setAnswers(initAnswers())
     setCompleted(false)
   }
 
   if (completed) {
-    const correct = selectedAnswers.filter(
-      (ans, i) => ans === QUESTIONS[i].correctIndex
-    ).length
+    const correct = QUESTIONS.filter((q, i) => isCorrect(q, answers[i])).length
     const pct = Math.round((correct / QUESTIONS.length) * 100)
     return (
       <StudentLayout>
@@ -101,30 +116,43 @@ export default function StudentDemoPage() {
           </CardContent>
         </Card>
 
-        {/* Answer options */}
-        <div className="grid grid-cols-2 gap-4">
-          {question.options.map((option, i) => (
-            <button
-              key={i}
-              data-testid={`option-${i}`}
-              aria-label={`Answer ${i + 1}: ${option}`}
-              aria-pressed={selected === i}
-              onClick={() => handleSelect(i)}
-              className={`
-                rounded-2xl border-2 p-6 text-3xl font-bold text-slate-700
-                active:scale-95 transition-all duration-100
-                min-h-[80px] cursor-pointer
-                ${
-                  selected === i
-                    ? 'border-amber-500 bg-amber-100'
-                    : 'border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50'
-                }
-              `}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
+        {/* Answer area — branches on question type */}
+        {question.type === 'mcq' ? (
+          <div className="grid grid-cols-2 gap-4">
+            {(question as MCQQuestion).options.map((option, i) => (
+              <button
+                key={i}
+                data-testid={`option-${i}`}
+                aria-label={`Answer ${i + 1}: ${option}`}
+                aria-pressed={currentAnswer === i}
+                onClick={() => handleSelectMCQ(i)}
+                className={`
+                  rounded-2xl border-2 p-6 text-3xl font-bold text-slate-700
+                  active:scale-95 transition-all duration-100
+                  min-h-[80px] cursor-pointer
+                  ${
+                    currentAnswer === i
+                      ? 'border-amber-500 bg-amber-100'
+                      : 'border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50'
+                  }
+                `}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <input
+              data-testid="subjective-input"
+              type="text"
+              value={typeof currentAnswer === 'string' ? currentAnswer : ''}
+              onChange={e => handleTypeSubjective(e.target.value)}
+              placeholder="Type your answer here…"
+              className="w-full rounded-2xl border-2 border-amber-200 p-6 text-3xl font-bold text-slate-700 focus:border-amber-500 focus:outline-none"
+            />
+          </div>
+        )}
 
         {/* Navigation */}
         <div className="flex items-center justify-between pt-2">
