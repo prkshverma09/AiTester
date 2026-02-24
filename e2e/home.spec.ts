@@ -23,7 +23,7 @@ test.describe('Home page', () => {
     await page.getByRole('link', { name: /student test view/i }).click()
     await expect(page).toHaveURL('/student-demo')
     await expect(page.getByTestId('question-label')).toContainText(
-      'Question 1 of 10'
+      'Question 1 of 12'
     )
   })
 })
