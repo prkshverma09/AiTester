@@ -59,7 +59,13 @@ describe('QUESTIONS loader', () => {
   it('first question is MCQ', () => {
     expect(QUESTIONS[0].type).toBe('mcq')
   })
-  it('last question is subjective', () => {
-    expect(QUESTIONS[11].type).toBe('subjective')
+  it('subjective questions are at positions 3, 6, 9 (indices 2, 5, 8)', () => {
+    expect(QUESTIONS[2].type).toBe('subjective')
+    expect(QUESTIONS[5].type).toBe('subjective')
+    expect(QUESTIONS[8].type).toBe('subjective')
+  })
+  it('contains exactly 3 subjective questions', () => {
+    const count = QUESTIONS.filter(q => q.type === 'subjective').length
+    expect(count).toBe(3)
   })
 })

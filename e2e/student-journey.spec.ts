@@ -90,8 +90,8 @@ test.describe('Full student journey', () => {
     await page.getByTestId('option-1').click()
     await page.getByTestId('next-btn').click()
 
-    // Student answers Q3: clicks '21' (option-2, correct) and moves on
-    await page.getByTestId('option-2').click()
+    // Student answers Q3 — a word problem: types the correct answer '8' and moves on
+    await page.getByTestId('subjective-input').fill('8')
     await page.getByTestId('next-btn').click()
 
     // Student gets a bit confused on Q4 — picks '5' (option-0, wrong answer) and moves on
@@ -102,13 +102,16 @@ test.describe('Full student journey', () => {
     await page.getByTestId('option-0').click()
     await page.getByTestId('next-btn').click()
 
-    // Student has answered 5 questions and now sees Question 6 of 12
+    // Student has answered 5 questions and now sees Question 6 of 12 — a subtraction word problem
     await expect(page.getByTestId('question-label')).toContainText('Question 6 of 12')
 
-    // Student reads the next question: subtraction — "What is 23 − 9?"
-    await expect(page.getByText('What is 23 − 9?')).toBeVisible()
+    // Student sees the subjective input (word problem)
+    await expect(page.getByTestId('subjective-input')).toBeVisible()
 
-    // Student notices the concept badge now shows "Subtraction"
+    // Student reads the word problem text about stickers
+    await expect(page.getByText('Sam has 12 stickers')).toBeVisible()
+
+    // Student notices the concept badge shows "Subtraction"
     await expect(page.getByText('Subtraction')).toBeVisible()
   })
 
@@ -124,8 +127,8 @@ test.describe('Full student journey', () => {
     await page.getByTestId('option-1').click()
     await page.getByTestId('next-btn').click()
 
-    // Q3: student picks the correct answer '21' (option-2)
-    await page.getByTestId('option-2').click()
+    // Q3: student types the correct answer '8' (Tom apples word problem)
+    await page.getByTestId('subjective-input').fill('8')
     await page.getByTestId('next-btn').click()
 
     // Q4: student picks the wrong answer '5' (option-0, correct is '6')
@@ -136,8 +139,8 @@ test.describe('Full student journey', () => {
     await page.getByTestId('option-0').click()
     await page.getByTestId('next-btn').click()
 
-    // Q6: student picks the correct answer '14' (option-2)
-    await page.getByTestId('option-2').click()
+    // Q6: student types the correct answer '7' (Sam stickers word problem)
+    await page.getByTestId('subjective-input').fill('7')
     await page.getByTestId('next-btn').click()
 
     // Q7: student picks the wrong answer '36' (option-0, correct is '42')
@@ -148,30 +151,30 @@ test.describe('Full student journey', () => {
     await page.getByTestId('option-1').click()
     await page.getByTestId('next-btn').click()
 
-    // Q9: student picks the wrong answer '48' (option-0, correct is '56')
-    await page.getByTestId('option-0').click()
+    // Q9: student types the correct answer '12' (marbles word problem)
+    await page.getByTestId('subjective-input').fill('12')
     await page.getByTestId('next-btn').click()
 
-    // Q10: student picks the correct answer '24' (option-2)
+    // Q10: student picks the correct answer '21' (option-2, 13+8=21)
     await page.getByTestId('option-2').click()
     await page.getByTestId('next-btn').click()
 
-    // Q11: student types the correct answer '7'
-    await page.getByTestId('subjective-input').fill('7')
+    // Q11: student picks the correct answer '14' (option-2, 23-9=14)
+    await page.getByTestId('option-2').click()
     await page.getByTestId('next-btn').click()
 
-    // Q12: student types a wrong answer
-    await page.getByTestId('subjective-input').fill('wrong')
+    // Q12: student picks the wrong answer '20' (option-0, correct is '24')
+    await page.getByTestId('option-0').click()
     await page.getByTestId('next-btn').click()
 
     // Student has finished all 12 questions — the score screen appears
     await expect(page.getByTestId('score-heading')).toBeVisible()
 
-    // Student reads their result: 7 out of 12 correct (Q1, Q2, Q3, Q6, Q8, Q10, Q11)
-    await expect(page.getByTestId('score-heading')).toContainText('You got 7 / 12 correct!')
+    // Student reads their result: 8 out of 12 correct (Q1, Q2, Q3, Q6, Q8, Q9, Q10, Q11)
+    await expect(page.getByTestId('score-heading')).toContainText('You got 8 / 12 correct!')
 
-    // Student sees their percentage score: 58%
-    await expect(page.getByText('58%')).toBeVisible()
+    // Student sees their percentage score: 67%
+    await expect(page.getByText('67%')).toBeVisible()
 
     // Student sees the "Try Again" button to retake the quiz
     await expect(page.getByTestId('try-again')).toBeVisible()

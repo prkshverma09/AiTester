@@ -39,28 +39,28 @@ test.describe('Student quiz flow', () => {
   })
 
   test('subjective question shows text input instead of option buttons', async ({ page }) => {
-    // Navigate to Q11 (first subjective question, index 10)
-    for (let i = 0; i < 10; i++) {
+    // Navigate to Q3 (first subjective question, index 2) — only 2 MCQ clicks needed
+    for (let i = 0; i < 2; i++) {
       await page.getByTestId('option-0').click()
       await page.getByTestId('next-btn').click()
     }
-    await expect(page.getByTestId('question-label')).toContainText('Question 11 of 12')
+    await expect(page.getByTestId('question-label')).toContainText('Question 3 of 12')
     await expect(page.getByTestId('subjective-input')).toBeVisible()
     await expect(page.getByTestId('option-0')).not.toBeVisible()
   })
 
   test('Next blocked until subjective input is non-empty', async ({ page }) => {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 2; i++) {
       await page.getByTestId('option-0').click()
       await page.getByTestId('next-btn').click()
     }
-    // On Q11 — input empty
+    // On Q3 — input empty
     await page.getByTestId('next-btn').click()
-    await expect(page.getByTestId('question-label')).toContainText('Question 11 of 12')
+    await expect(page.getByTestId('question-label')).toContainText('Question 3 of 12')
     // Type something — Next should advance
-    await page.getByTestId('subjective-input').fill('7')
+    await page.getByTestId('subjective-input').fill('8')
     await page.getByTestId('next-btn').click()
-    await expect(page.getByTestId('question-label')).toContainText('Question 12 of 12')
+    await expect(page.getByTestId('question-label')).toContainText('Question 4 of 12')
   })
 
   test('completing all 12 questions shows score screen', async ({ page }) => {
@@ -91,17 +91,35 @@ test.describe('Student quiz flow', () => {
   })
 
   test('score reflects correct answers', async ({ page }) => {
-    // MCQ correct picks: Q1→idx2(7), Q2→idx1(15), Q3→idx2(21), Q4-Q10→idx0(wrong)
-    // Subjective: Q11→'7'(correct), Q12→'wrong'
-    const mcqPicks = [2, 1, 2, 0, 0, 0, 0, 0, 0, 0]
-    for (const pick of mcqPicks) {
-      await page.getByTestId(`option-${pick}`).click()
+    // Q1: MCQ → option-2 correct (4+3=7)
+    await page.getByTestId('option-2').click()
+    await page.getByTestId('next-btn').click()
+    // Q2: MCQ → option-1 correct (9+6=15)
+    await page.getByTestId('option-1').click()
+    await page.getByTestId('next-btn').click()
+    // Q3: Subjective → '8' correct (Tom apples)
+    await page.getByTestId('subjective-input').fill('8')
+    await page.getByTestId('next-btn').click()
+    // Q4: MCQ → option-0 wrong (10-4=6, picked '5')
+    await page.getByTestId('option-0').click()
+    await page.getByTestId('next-btn').click()
+    // Q5: MCQ → option-0 wrong (15-7=8, picked '7')
+    await page.getByTestId('option-0').click()
+    await page.getByTestId('next-btn').click()
+    // Q6: Subjective → '7' correct (Sam stickers)
+    await page.getByTestId('subjective-input').fill('7')
+    await page.getByTestId('next-btn').click()
+    // Q7 through Q12: all wrong (option-0 for MCQ, 'wrong' for subjective)
+    for (let i = 0; i < 6; i++) {
+      const optionBtn = page.getByTestId('option-0')
+      if (await optionBtn.isVisible()) {
+        await optionBtn.click()
+      } else {
+        await page.getByTestId('subjective-input').fill('wrong')
+      }
       await page.getByTestId('next-btn').click()
     }
-    await page.getByTestId('subjective-input').fill('7')   // Q11 correct
-    await page.getByTestId('next-btn').click()
-    await page.getByTestId('subjective-input').fill('wrong') // Q12 wrong
-    await page.getByTestId('next-btn').click()
+    // Q1✓ Q2✓ Q3✓ Q6✓ = 4 correct
     await expect(page.getByTestId('score-heading')).toContainText('You got 4 / 12 correct!')
   })
 })
