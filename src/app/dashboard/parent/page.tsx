@@ -1,4 +1,8 @@
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { getRoleForUser } from '@/lib/auth/get-role'
 import { ParentLayout } from '@/components/layouts/ParentLayout'
+import { LogoutButton } from '@/components/auth/LogoutButton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -11,13 +15,15 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 
-const students = [
-  { id: '1', name: 'Alice', age: 8, conceptScores: [{ concept: 'Addition & Subtraction', score: 85, date: 'Feb 22' }, { concept: 'Place Value', score: 91, date: 'Feb 18' }] },
-  { id: '2', name: 'Bob', age: 10, conceptScores: [{ concept: 'Multiplication Tables', score: 62, date: 'Feb 21' }, { concept: 'Fractions (Intro)', score: 74, date: 'Feb 15' }] },
+type ConceptScore = { concept: string; score: number; date: string }
+
+const MOCK_STUDENTS: { id: string; name: string; age: number; conceptScores: ConceptScore[] }[] = [
+  { id: '1', name: 'Alice', age: 8, conceptScores: [{ concept: 'Addition & Subtraction', score: 85, date: 'Feb 23' }, { concept: 'Place Value', score: 91, date: 'Feb 18' }] },
+  { id: '2', name: 'Bob', age: 10, conceptScores: [{ concept: 'Multiplication Tables', score: 62, date: 'Feb 22' }, { concept: 'Fractions (Intro)', score: 74, date: 'Feb 15' }] },
   { id: '3', name: 'Charlie', age: 7, conceptScores: [] },
 ]
 
-const recentSessions = [
+const MOCK_RECENT_SESSIONS = [
   { student: 'Alice', concept: 'Addition & Subtraction', score: 85, date: 'Feb 22' },
   { student: 'Bob', concept: 'Multiplication Tables', score: 62, date: 'Feb 21' },
   { student: 'Alice', concept: 'Place Value', score: 91, date: 'Feb 18' },
@@ -36,22 +42,121 @@ function scoreBadge(score: number) {
   return 'destructive'
 }
 
-export default function ParentDemoPage() {
+export default async function ParentDashboardPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user?.id) {
+    redirect('/login/parent')
+  }
+
+  const role = await getRoleForUser(supabase, user.id)
+  if (role?.role === 'student') {
+    redirect('/dashboard/student')
+  }
+  if (role?.role !== 'parent') {
+    redirect('/login/parent')
+  }
+
+  const { data: studentsRows } = await supabase
+    .from('students')
+    .select('id, name, age')
+    .order('name')
+
+  type StudentDisplay = {
+    id: string
+    name: string
+    age: number
+    conceptScores: ConceptScore[]
+  }
+
+  let students: StudentDisplay[] = MOCK_STUDENTS
+  if (studentsRows?.length) {
+    students = await Promise.all(
+      studentsRows.map(async (s) => {
+        const { data: sessions } = await supabase
+          .from('test_sessions')
+          .select('id, concept, end_time')
+          .eq('student_id', s.id)
+          .eq('status', 'completed')
+          .order('end_time', { ascending: false })
+        const conceptScores: ConceptScore[] = []
+        if (sessions?.length) {
+          for (const sess of sessions) {
+            const { data: answers } = await supabase
+              .from('test_answers')
+              .select('is_correct')
+              .eq('session_id', sess.id)
+            const score = answers?.length
+              ? Math.round((answers.filter((a) => a.is_correct).length / answers.length) * 100)
+              : 0
+            conceptScores.push({
+              concept: sess.concept,
+              score,
+              date: sess.end_time ? new Date(sess.end_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '',
+            })
+          }
+        }
+        return {
+          id: s.id,
+          name: s.name,
+          age: s.age,
+          conceptScores,
+        }
+      })
+    )
+  }
+
+  let recentSessions: { student: string; concept: string; score: number; date: string }[] = MOCK_RECENT_SESSIONS
+  if (studentsRows?.length) {
+    const { data: sessions } = await supabase
+      .from('test_sessions')
+      .select('id, student_id, concept, end_time')
+      .in('student_id', studentsRows.map((s) => s.id))
+      .eq('status', 'completed')
+      .order('end_time', { ascending: false })
+      .limit(10)
+    if (sessions?.length) {
+      const names = new Map(studentsRows.map((s) => [s.id, s.name]))
+      const withScores = await Promise.all(
+        sessions.map(async (sess) => {
+          const { data: answers } = await supabase
+            .from('test_answers')
+            .select('is_correct')
+            .eq('session_id', sess.id)
+          const score = answers?.length
+            ? Math.round((answers.filter((a) => a.is_correct).length / answers.length) * 100)
+            : 0
+          return {
+            student: names.get(sess.student_id) ?? 'Child',
+            concept: sess.concept,
+            score,
+            date: sess.end_time ? new Date(sess.end_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '',
+          }
+        })
+      )
+      recentSessions = withScores
+    }
+  }
+
+  const displayName = user.email?.split('@')[0] ?? 'Parent'
+  const count = students.length
+
   return (
     <ParentLayout>
       <div className="space-y-8">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
             <p className="text-slate-500 text-sm mt-1">
-              Welcome back, Sarah — 3 children registered
+              Welcome back, {displayName} — {count} children registered
             </p>
           </div>
-          <Button>+ Add Child</Button>
+          <div className="flex items-center gap-2">
+            <Button>+ Add Child</Button>
+            <LogoutButton />
+          </div>
         </div>
 
-        {/* Student Cards */}
         <div>
           <h2 className="text-lg font-semibold text-slate-700 mb-4">Your Children</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -87,7 +192,6 @@ export default function ParentDemoPage() {
           </div>
         </div>
 
-        {/* Recent Sessions Table */}
         <div>
           <h2 className="text-lg font-semibold text-slate-700 mb-4">Recent Sessions</h2>
           <Card>
@@ -104,7 +208,7 @@ export default function ParentDemoPage() {
                 </thead>
                 <tbody>
                   {recentSessions.map((session, i) => (
-                    <tr key={`${session.student}-${session.date}`} className="border-b border-slate-50 hover:bg-slate-50">
+                    <tr key={`${session.student}-${session.date}-${i}`} className="border-b border-slate-50 hover:bg-slate-50">
                       <td className="p-4 font-medium">{session.student}</td>
                       <td className="p-4 text-slate-600">{session.concept}</td>
                       <td className="p-4">

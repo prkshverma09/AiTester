@@ -53,19 +53,19 @@ describe('isCorrect', () => {
 })
 
 describe('QUESTIONS loader', () => {
-  it('loads 12 questions from mixed-demo.json', () => {
+  it('loads 12 questions from all concept files', () => {
     expect(QUESTIONS).toHaveLength(12)
   })
   it('first question is MCQ', () => {
     expect(QUESTIONS[0].type).toBe('mcq')
   })
-  it('subjective questions are at positions 3, 6, 9 (indices 2, 5, 8)', () => {
-    expect(QUESTIONS[2].type).toBe('subjective')
-    expect(QUESTIONS[5].type).toBe('subjective')
-    expect(QUESTIONS[8].type).toBe('subjective')
-  })
   it('contains exactly 3 subjective questions', () => {
     const count = QUESTIONS.filter(q => q.type === 'subjective').length
     expect(count).toBe(3)
+  })
+  it('contains both MCQ and subjective types', () => {
+    const types = [...new Set(QUESTIONS.map(q => q.type))]
+    expect(types).toContain('mcq')
+    expect(types).toContain('subjective')
   })
 })

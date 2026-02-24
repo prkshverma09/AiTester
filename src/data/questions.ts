@@ -62,7 +62,26 @@ export function isCorrect(question: Question, answer: string | number): boolean 
   return accepted.some(a => norm(a) === norm(String(answer)))
 }
 
-// --- Data loader ---
-import mixedDemoData from './questions/mixed-demo.json'
+// --- Data loader (one JSON file per concept) ---
+import additionSet from './questions/addition.json'
+import subtractionSet from './questions/subtraction.json'
+import multiplicationSet from './questions/multiplication.json'
 
-export const QUESTIONS: Question[] = (mixedDemoData as QuestionSet).questions
+const CONCEPT_SETS: Record<string, QuestionSet> = {
+  Addition: additionSet as QuestionSet,
+  Subtraction: subtractionSet as QuestionSet,
+  Multiplication: multiplicationSet as QuestionSet,
+}
+
+/** Ordered list of concept names (used for dashboard and test routes). */
+export const CONCEPTS: string[] = Object.keys(CONCEPT_SETS).sort()
+
+/** Questions for a single concept (by display name, e.g. "Addition"). */
+export function getQuestionsForConcept(conceptName: string): Question[] {
+  return CONCEPT_SETS[conceptName]?.questions ?? []
+}
+
+/** All questions from all concept files (for demo page and tests). */
+export const QUESTIONS: Question[] = CONCEPTS.flatMap((name) =>
+  CONCEPT_SETS[name].questions
+)

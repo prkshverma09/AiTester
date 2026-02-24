@@ -1,0 +1,47 @@
+{
+  "id": "multiplication",
+  "name": "Multiplication",
+  "description": "Multiplication and times tables",
+  "questions": [
+    {
+      "id": "q7",
+      "type": "mcq",
+      "text": "What is 6 × 7?",
+      "concept": "Multiplication",
+      "difficulty": 3,
+      "tags": ["times-tables"],
+      "options": ["36", "40", "42", "48"],
+      "correctIndex": 2
+    },
+    {
+      "id": "q8",
+      "type": "mcq",
+      "text": "What is 8 × 9?",
+      "concept": "Multiplication",
+      "difficulty": 3,
+      "tags": ["times-tables"],
+      "options": ["63", "72", "78", "81"],
+      "correctIndex": 1
+    },
+    {
+      "id": "q9",
+      "type": "subjective",
+      "text": "A bag has 4 rows of 3 marbles. How many marbles are there in total?",
+      "concept": "Multiplication",
+      "difficulty": 3,
+      "tags": ["word-problem"],
+      "correctAnswer": "12",
+      "acceptedAnswers": ["twelve"]
+    },
+    {
+      "id": "q12",
+      "type": "mcq",
+      "text": "What is 4 × 6?",
+      "concept": "Multiplication",
+      "difficulty": 2,
+      "tags": ["times-tables"],
+      "options": ["20", "22", "24", "26"],
+      "correctIndex": 2
+    }
+  ]
+}

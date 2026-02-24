@@ -1,0 +1,47 @@
+{
+  "id": "subtraction",
+  "name": "Subtraction",
+  "description": "Basic subtraction for young learners",
+  "questions": [
+    {
+      "id": "q4",
+      "type": "mcq",
+      "text": "What is 10 − 4?",
+      "concept": "Subtraction",
+      "difficulty": 1,
+      "tags": ["single-digit"],
+      "options": ["5", "6", "7", "8"],
+      "correctIndex": 1
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "text": "What is 15 − 7?",
+      "concept": "Subtraction",
+      "difficulty": 2,
+      "tags": ["single-digit"],
+      "options": ["7", "8", "9", "10"],
+      "correctIndex": 1
+    },
+    {
+      "id": "q6",
+      "type": "subjective",
+      "text": "Sam has 12 stickers. He gives 5 to his friend. How many does he have left?",
+      "concept": "Subtraction",
+      "difficulty": 2,
+      "tags": ["word-problem"],
+      "correctAnswer": "7",
+      "acceptedAnswers": ["seven"]
+    },
+    {
+      "id": "q11",
+      "type": "mcq",
+      "text": "What is 23 − 9?",
+      "concept": "Subtraction",
+      "difficulty": 2,
+      "tags": ["two-digit"],
+      "options": ["12", "13", "14", "15"],
+      "correctIndex": 2
+    }
+  ]
+}

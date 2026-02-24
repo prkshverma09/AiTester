@@ -32,6 +32,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# generated seed with user IDs (project-specific)
+supabase/seed-ready.sql
+
 # env files (can opt-in for committing if needed)
 .env*
 !.env.local.example

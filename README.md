@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MathDiagnose
+
+AI-powered math diagnostic platform for children ages 5–12.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). The home page offers **Parent Login** and **Student Login**. Full auth and dashboards require Supabase.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Test login credentials
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Use these accounts for manual testing after [Supabase setup](#supabase-setup) and [Seed](#seed-create-test-users-and-data):
 
-## Learn More
+| Role    | Email                           | Password        |
+|---------|----------------------------------|-----------------|
+| Parent  | `parent@mathdiagnose.example`   | `TestParent123!`  |
+| Student | `student@mathdiagnose.example`  | `TestStudent123!` |
 
-To learn more about Next.js, take a look at the following resources:
+- **Parent** → [Parent Login](http://localhost:3000/login/parent) → Parent dashboard (children, sessions, reports).
+- **Student** → [Student Login](http://localhost:3000/login/student) → Student dashboard (progress, take tests by concept).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Supabase Setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Full step-by-step:** [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md)
 
-## Deploy on Vercel
+1. Create a [Supabase](https://supabase.com) project.
+2. Copy env: `cp .env.local.example .env.local`
+3. Set in `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL` — project URL (Project Settings → API)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — anon public key (Project Settings → API)
+   - `GOOGLE_GEMINI_API_KEY` — for future AI features
+4. Run migrations in the Supabase **SQL Editor** (in order):
+   - `supabase/migrations/20260223000001_initial_schema.sql`
+   - `supabase/migrations/20260223000002_auth_trigger.sql`
+   - `supabase/migrations/20260224000001_student_accounts.sql`
+5. Create test users and seed data (see **Test credentials** and **Seed** below).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Test credentials (manual testing)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+After running the seed (see **Seed**), you can sign in with:
+
+| Role    | Email                         | Password      | After login        |
+|---------|-------------------------------|---------------|--------------------|
+| Parent  | `parent@mathdiagnose.example` | `TestParent123!` | Parent dashboard   |
+| Student | `student@mathdiagnose.example` | `TestStudent123!` | Student dashboard |
+
+## Seed (create test users and data)
+
+1. In Supabase Dashboard → **Authentication** → **Users**, create two users:
+   - **Parent:** email `parent@mathdiagnose.example`, password `TestParent123!`
+   - **Student:** email `student@mathdiagnose.example`, password `TestStudent123!`
+2. Get their IDs:  
+   `SELECT id, email FROM auth.users WHERE email IN ('parent@mathdiagnose.example', 'student@mathdiagnose.example');`
+3. Open `supabase/seed.sql`, replace:
+   - `PASTE_PARENT_USER_ID_HERE` with the parent user UUID
+   - `PASTE_STUDENT_AUTH_USER_ID_HERE` with the student user UUID
+4. Run `supabase/seed.sql` in the Supabase SQL Editor.
+
+## Manual test steps
+
+### Parent flow
+
+1. Open [http://localhost:3000](http://localhost:3000).
+2. Click **Parent Login**.
+3. Sign in with `parent@mathdiagnose.example` / `TestParent123!`.
+4. You should land on the **Parent dashboard** (children, recent sessions, “View Report”, “Start Test”).
+5. Click **Log out** and confirm you are back on the home page.
+
+### Student flow
+
+1. Open [http://localhost:3000](http://localhost:3000).
+2. Click **Student Login**.
+3. Sign in with `student@mathdiagnose.example` / `TestStudent123!`.
+4. You should land on **My Dashboard** (progress and “Take a test” with concepts).
+5. Click **Take test** for a concept (e.g. Addition). Complete the quiz and click **Back to dashboard**.
+6. Confirm the new session appears under “Your Progress”.
+7. Click **Log out** and confirm you are back on the home page.
+
+### Wrong account type
+
+1. On **Parent Login**, sign in with `student@mathdiagnose.example` / `TestStudent123!`.  
+   An error should appear: “This account is not a parent account. Use Student Login instead.”
+2. On **Student Login**, sign in with `parent@mathdiagnose.example` / `TestParent123!`.  
+   An error should appear: “This account is not a student account. Use Parent Login instead.”
+
+## Demo routes (no login)
+
+- **Parent dashboard (demo):** [http://localhost:3000/parent-demo](http://localhost:3000/parent-demo)
+- **Student test (demo):** [http://localhost:3000/student-demo](http://localhost:3000/student-demo)
+
+## Tests
+
+- **Unit / component:** `npm run test`
+- **E2E (Playwright):** `npm run test:e2e`  
+  First time: run `npx playwright install` to install browsers. E2E starts the dev server and runs all specs. Login flows require Supabase and seeded test users. To run e2e without auth-dependent tests, set `E2E_SKIP_AUTH=1`:
+
+  ```bash
+  npx playwright install   # once
+  npm run test:e2e
+  ```
+
+**If parent/student login shows an env error:** ensure `.env.local` has `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (and `GOOGLE_GEMINI_API_KEY`). Copy from `.env.local.example` if needed.
+
+## Learn more
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Supabase Auth](https://supabase.com/docs/guides/auth)

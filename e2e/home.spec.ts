@@ -11,19 +11,19 @@ test.describe('Home page', () => {
     ).toBeVisible()
   })
 
-  test('navigates to parent dashboard on link click', async ({ page }) => {
-    await page.getByRole('link', { name: /parent dashboard/i }).click()
-    await expect(page).toHaveURL('/parent-demo')
+  test('navigates to parent login on link click', async ({ page }) => {
+    await page.getByRole('link', { name: /parent login/i }).click()
+    await expect(page).toHaveURL('/login/parent')
     await expect(
-      page.getByRole('heading', { name: 'Dashboard' })
+      page.getByRole('heading', { name: 'Parent Login' })
     ).toBeVisible()
   })
 
-  test('navigates to student test view on link click', async ({ page }) => {
-    await page.getByRole('link', { name: /student test view/i }).click()
-    await expect(page).toHaveURL('/student-demo')
-    await expect(page.getByTestId('question-label')).toContainText(
-      'Question 1 of 12'
-    )
+  test('navigates to student login on link click', async ({ page }) => {
+    await page.getByRole('link', { name: /student login/i }).click()
+    await expect(page).toHaveURL('/login/student')
+    await expect(
+      page.getByRole('heading', { name: 'Student Login' })
+    ).toBeVisible()
   })
 })

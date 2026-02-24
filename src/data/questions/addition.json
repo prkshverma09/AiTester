@@ -1,0 +1,47 @@
+{
+  "id": "addition",
+  "name": "Addition",
+  "description": "Basic addition for young learners",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "text": "What is 4 + 3?",
+      "concept": "Addition",
+      "difficulty": 1,
+      "tags": ["single-digit"],
+      "options": ["5", "6", "7", "8"],
+      "correctIndex": 2
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "text": "What is 9 + 6?",
+      "concept": "Addition",
+      "difficulty": 1,
+      "tags": ["single-digit"],
+      "options": ["14", "15", "16", "17"],
+      "correctIndex": 1
+    },
+    {
+      "id": "q3",
+      "type": "subjective",
+      "text": "Tom has 3 apples. His friend gives him 5 more. How many apples does he have?",
+      "concept": "Addition",
+      "difficulty": 1,
+      "tags": ["word-problem"],
+      "correctAnswer": "8",
+      "acceptedAnswers": ["eight"]
+    },
+    {
+      "id": "q10",
+      "type": "mcq",
+      "text": "What is 13 + 8?",
+      "concept": "Addition",
+      "difficulty": 2,
+      "tags": ["two-digit"],
+      "options": ["19", "20", "21", "22"],
+      "correctIndex": 2
+    }
+  ]
+}
