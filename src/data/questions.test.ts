@@ -25,6 +25,9 @@ describe('isCorrect', () => {
     it('returns false for unanswered (-1)', () => {
       expect(isCorrect(mcq, -1)).toBe(false)
     })
+    it('returns false when a string index is passed instead of number', () => {
+      expect(isCorrect(mcq, '1')).toBe(false)
+    })
   })
 
   describe('subjective — exact match', () => {
