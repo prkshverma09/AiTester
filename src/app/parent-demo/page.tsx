@@ -1,8 +1,17 @@
+import Link from 'next/link'
 import { ParentLayout } from '@/components/layouts/ParentLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 const students = [
   {
@@ -97,9 +106,11 @@ export default function ParentDemoPage() {
                       </div>
                     </>
                   )}
-                  <Button variant="outline" size="sm" className="w-full">
-                    Start Test
-                  </Button>
+                  <Link href="/student-demo" className="block w-full">
+                    <Button variant="outline" size="sm" className="w-full">
+                      Start Test
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
@@ -133,7 +144,44 @@ export default function ParentDemoPage() {
                       </td>
                       <td className="p-4 text-slate-400">{session.date}</td>
                       <td className="p-4">
-                        <Button variant="ghost" size="sm">View Report</Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="sm">View Report</Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Session Report</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-3 text-sm">
+                              <div className="flex justify-between border-b pb-2">
+                                <span className="text-slate-500">Child</span>
+                                <span className="font-medium">{session.student}</span>
+                              </div>
+                              <div className="flex justify-between border-b pb-2">
+                                <span className="text-slate-500">Concept</span>
+                                <span className="font-medium">{session.concept}</span>
+                              </div>
+                              <div className="flex justify-between border-b pb-2">
+                                <span className="text-slate-500">Score</span>
+                                <span className={`font-semibold ${scoreColor(session.score)}`}>
+                                  {session.score}%
+                                </span>
+                              </div>
+                              <div className="flex justify-between border-b pb-2">
+                                <span className="text-slate-500">Date</span>
+                                <span className="font-medium">{session.date}</span>
+                              </div>
+                              <p className="text-slate-500 pt-1">
+                                {session.score >= 80
+                                  ? 'Great performance! Ready to move to the next concept.'
+                                  : session.score >= 60
+                                  ? 'Good effort. A bit more practice on this concept is recommended.'
+                                  : 'Needs more support on this concept before progressing.'}
+                              </p>
+                            </div>
+                            <DialogFooter showCloseButton />
+                          </DialogContent>
+                        </Dialog>
                       </td>
                     </tr>
                   ))}
