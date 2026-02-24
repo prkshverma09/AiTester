@@ -123,7 +123,7 @@ export default function ParentDemoPage() {
                 </thead>
                 <tbody>
                   {recentSessions.map((session, i) => (
-                    <tr key={i} className="border-b border-slate-50 hover:bg-slate-50">
+                    <tr key={`${session.student}-${session.date}`} className="border-b border-slate-50 hover:bg-slate-50">
                       <td className="p-4 font-medium">{session.student}</td>
                       <td className="p-4 text-slate-600">{session.concept}</td>
                       <td className="p-4">

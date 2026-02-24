@@ -107,6 +107,8 @@ export default function StudentDemoPage() {
             <button
               key={i}
               data-testid={`option-${i}`}
+              aria-label={`Answer ${i + 1}: ${option}`}
+              aria-pressed={selected === i}
               onClick={() => handleSelect(i)}
               className={`
                 rounded-2xl border-2 p-6 text-3xl font-bold text-slate-700
@@ -127,6 +129,7 @@ export default function StudentDemoPage() {
         {/* Navigation */}
         <div className="flex items-center justify-between pt-2">
           <Button
+            data-testid="back-btn"
             variant="outline"
             size="lg"
             className="text-base px-8"

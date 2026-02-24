@@ -33,7 +33,7 @@ test.describe('Student quiz flow', () => {
     await page.getByTestId('option-1').click()
     await page.getByTestId('next-btn').click()
     await expect(page.getByTestId('question-label')).toContainText('Question 2 of 10')
-    await page.getByRole('button', { name: /back/i }).click()
+    await page.getByTestId('back-btn').click()
     await expect(page.getByTestId('question-label')).toContainText('Question 1 of 10')
     await expect(page.getByTestId('option-1')).toHaveClass(/border-amber-500/)
   })
@@ -53,5 +53,18 @@ test.describe('Student quiz flow', () => {
     }
     await page.getByTestId('try-again').click()
     await expect(page.getByTestId('question-label')).toContainText('Question 1 of 10')
+  })
+
+  test('score reflects correct answers when choosing right options', async ({ page }) => {
+    // Q1: 4+3=7, options=['5','6','7','8'], correctIndex=2 → option-2
+    // Q2: 9+6=15, options=['14','15','16','17'], correctIndex=1 → option-1
+    // Q3: 13+8=21, options=['19','20','21','22'], correctIndex=2 → option-2
+    // Q4-Q10: always choose option-0 (wrong)
+    const correctPicks = [2, 1, 2, 0, 0, 0, 0, 0, 0, 0]
+    for (const pick of correctPicks) {
+      await page.getByTestId(`option-${pick}`).click()
+      await page.getByTestId('next-btn').click()
+    }
+    await expect(page.getByTestId('score-heading')).toContainText('You got 3 / 10 correct!')
   })
 })
