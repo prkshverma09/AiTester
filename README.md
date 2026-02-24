@@ -105,6 +105,19 @@ After running the seed (see **Seed**), you can sign in with:
 
 **If parent/student login shows an env error:** ensure `.env.local` has `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (and `GOOGLE_GEMINI_API_KEY`). Copy from `.env.local.example` if needed.
 
+## Deploy to Vercel
+
+1. **Push your code** to GitHub (this repo: `prkshverma09/AiTester`).
+2. In [Vercel](https://vercel.com), click **Add New** → **Project** and import the GitHub repo.
+3. **Environment variables** (required for the app to run):
+   - `NEXT_PUBLIC_SUPABASE_URL` — your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon key
+   - `GOOGLE_GEMINI_API_KEY` — your Gemini API key  
+   Add them in **Settings → Environment Variables** (or during import). Apply to Production, Preview, and Development if you use Vercel previews.
+4. **Deploy.** Vercel will run `next build` and deploy. Your Supabase project stays the same; only the app runs on Vercel.
+
+**Note:** Migrations and seed are run against your Supabase project from your machine (or Supabase Dashboard), not from Vercel. `DATABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are only needed for the local setup script, not for the Vercel deployment.
+
 ## Learn more
 
 - [Next.js Documentation](https://nextjs.org/docs)

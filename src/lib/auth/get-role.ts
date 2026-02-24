@@ -3,14 +3,9 @@ export type AuthRole =
   | { role: 'student'; id: string; studentId: string }
   | null
 
-type SupabaseLike = {
-  from: (table: string) => {
-    select: (columns: string) => { eq: (col: string, value: string) => { single: () => Promise<{ data: unknown; error: unknown }> } }
-  }
-}
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- real SupabaseClient causes "excessively deep" instantiation; tests pass a mock
 export async function getRoleForUser(
-  supabase: SupabaseLike,
+  supabase: any,
   userId: string | null | undefined
 ): Promise<AuthRole> {
   if (userId == null || userId === '') return null
