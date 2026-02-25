@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "setup:supabase": "node scripts/supabase-setup.mjs",
+    "migrate": "node scripts/run-migrations.mjs",
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",

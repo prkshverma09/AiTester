@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getRoleForUser } from '@/lib/auth/get-role'
 import { ParentLayout } from '@/components/layouts/ParentLayout'
-import { LogoutButton } from '@/components/auth/LogoutButton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -138,7 +138,6 @@ export default async function ParentDashboardPage() {
     }
   }
 
-  const displayName = user.email?.split('@')[0] ?? 'Parent'
   const count = students.length
 
   return (
@@ -148,13 +147,10 @@ export default async function ParentDashboardPage() {
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
             <p className="text-slate-500 text-sm mt-1">
-              Welcome back, {displayName} — {count} children registered
+              {count} children registered
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button>+ Add Child</Button>
-            <LogoutButton />
-          </div>
+          <Button>+ Add Child</Button>
         </div>
 
         <div>
@@ -164,7 +160,14 @@ export default async function ParentDashboardPage() {
               <Card key={student.id}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{student.name}</CardTitle>
+                    <CardTitle className="text-base">
+                      <Link
+                        href={`/dashboard/parent/child/${student.id}`}
+                        className="hover:underline focus:underline"
+                      >
+                        {student.name}
+                      </Link>
+                    </CardTitle>
                     <span className="text-slate-400 text-sm">Age {student.age}</span>
                   </div>
                 </CardHeader>
@@ -186,6 +189,11 @@ export default async function ParentDashboardPage() {
                       ))}
                     </ul>
                   )}
+                  <Link href={`/dashboard/parent/child/${student.id}`}>
+                    <Button variant="outline" size="sm" className="w-full mt-2">
+                      View details
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}

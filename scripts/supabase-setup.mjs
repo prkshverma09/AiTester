@@ -144,7 +144,8 @@ async function main() {
       console.log('  1. supabase/migrations/20260223000001_initial_schema.sql')
       console.log('  2. supabase/migrations/20260223000002_auth_trigger.sql')
       console.log('  3. supabase/migrations/20260224000001_student_accounts.sql')
-      console.log('  4. supabase/seed-ready.sql')
+      console.log('  4. supabase/migrations/20260225000001_ai_reports.sql')
+      console.log('  5. supabase/seed-ready.sql')
       console.log('')
     }
   } else {
@@ -155,7 +156,8 @@ async function main() {
     console.log('  1. supabase/migrations/20260223000001_initial_schema.sql')
     console.log('  2. supabase/migrations/20260223000002_auth_trigger.sql')
     console.log('  3. supabase/migrations/20260224000001_student_accounts.sql')
-    console.log('  4. supabase/seed-ready.sql')
+    console.log('  4. supabase/migrations/20260225000001_ai_reports.sql')
+    console.log('  5. supabase/seed-ready.sql')
     console.log('')
   }
 
